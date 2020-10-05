@@ -1,10 +1,12 @@
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.EntityFrameworkCore;
+using ERP.Data;
 
 namespace ERP
 {
@@ -21,11 +23,19 @@ namespace ERP
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+            services.AddMvc();
+
+            var connection = @"Server=(localdb)\MSSQLLocalDB;Database=ERP;Trusted_Connection=True;";
+            services.AddDbContext<ERPContext>(options => options.UseSqlServer(connection));
+            
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
                 configuration.RootPath = "ClientApp/dist";
             });
+
+            services.AddDbContext<ERPContext>(options =>
+                    options.UseSqlServer(Configuration.GetConnectionString("ERPContext")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
