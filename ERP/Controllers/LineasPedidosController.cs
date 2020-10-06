@@ -12,48 +12,48 @@ namespace ERP.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProductoesController : ControllerBase
+    public class LineasPedidosController : ControllerBase
     {
         private readonly ERPContext _context;
 
-        public ProductoesController(ERPContext context)
+        public LineasPedidosController(ERPContext context)
         {
             _context = context;
         }
 
-        // GET: api/Productoes
+        // GET: api/LineasPedidos
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Producto>>> GetProductos()
+        public async Task<ActionResult<IEnumerable<LineasPedido>>> GetLineasPedidos()
         {
-            return await _context.Productos.ToListAsync();
+            return await _context.LineasPedidos.ToListAsync();
         }
 
-        // GET: api/Productoes/5
+        // GET: api/LineasPedidos/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Producto>> GetProducto(long id)
+        public async Task<ActionResult<LineasPedido>> GetLineasPedido(long id)
         {
-            var producto = await _context.Productos.FindAsync(id);
+            var lineasPedido = await _context.LineasPedidos.FindAsync(id);
 
-            if (producto == null)
+            if (lineasPedido == null)
             {
                 return NotFound();
             }
 
-            return producto;
+            return lineasPedido;
         }
 
-        // PUT: api/Productoes/5
+        // PUT: api/LineasPedidos/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutProducto(long id, Producto producto)
+        public async Task<IActionResult> PutLineasPedido(long id, LineasPedido lineasPedido)
         {
-            if (id != producto.Id)
+            if (id != lineasPedido.IdLinea)
             {
                 return BadRequest();
             }
 
-            _context.Entry(producto).State = EntityState.Modified;
+            _context.Entry(lineasPedido).State = EntityState.Modified;
 
             try
             {
@@ -61,7 +61,7 @@ namespace ERP.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ProductoExists(id))
+                if (!LineasPedidoExists(id))
                 {
                     return NotFound();
                 }
@@ -74,20 +74,20 @@ namespace ERP.Controllers
             return NoContent();
         }
 
-        // POST: api/Productoes
+        // POST: api/LineasPedidos
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public async Task<ActionResult<Producto>> PostProducto(Producto producto)
+        public async Task<ActionResult<LineasPedido>> PostLineasPedido(LineasPedido lineasPedido)
         {
-            _context.Productos.Add(producto);
+            _context.LineasPedidos.Add(lineasPedido);
             try
             {
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateException)
             {
-                if (ProductoExists(producto.Id))
+                if (LineasPedidoExists(lineasPedido.IdLinea))
                 {
                     return Conflict();
                 }
@@ -97,28 +97,28 @@ namespace ERP.Controllers
                 }
             }
 
-            return CreatedAtAction("GetProducto", new { id = producto.Id }, producto);
+            return CreatedAtAction("GetLineasPedido", new { id = lineasPedido.IdLinea }, lineasPedido);
         }
 
-        // DELETE: api/Productoes/5
+        // DELETE: api/LineasPedidos/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Producto>> DeleteProducto(long id)
+        public async Task<ActionResult<LineasPedido>> DeleteLineasPedido(long id)
         {
-            var producto = await _context.Productos.FindAsync(id);
-            if (producto == null)
+            var lineasPedido = await _context.LineasPedidos.FindAsync(id);
+            if (lineasPedido == null)
             {
                 return NotFound();
             }
 
-            _context.Productos.Remove(producto);
+            _context.LineasPedidos.Remove(lineasPedido);
             await _context.SaveChangesAsync();
 
-            return producto;
+            return lineasPedido;
         }
 
-        private bool ProductoExists(long id)
+        private bool LineasPedidoExists(long id)
         {
-            return _context.Productos.Any(e => e.Id == id);
+            return _context.LineasPedidos.Any(e => e.IdLinea == id);
         }
     }
 }

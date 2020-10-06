@@ -10,12 +10,27 @@ import { HomeComponent } from './home/home.component';
 import { CounterComponent } from './counter/counter.component';
 import { FetchDataComponent } from './fetch-data/fetch-data.component';
 
+import {MatButtonModule, MatCheckboxModule} from '@angular/material';
+import {MatInputModule} from '@angular/material/input';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatSidenavModule} from '@angular/material/sidenav';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
 @NgModule({
   declarations: [
     AppComponent,
     NavMenuComponent,
     HomeComponent,
     CounterComponent,
+    BrowserModule,
+    BrowserAnimationsModule,
+    MatButtonModule, 
+    MatCheckboxModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatSidenavModule,
+    AppRoutingModule,
+    HttpClientModule,
     FetchDataComponent
   ],
   imports: [
@@ -23,6 +38,10 @@ import { FetchDataComponent } from './fetch-data/fetch-data.component';
     HttpClientModule,
     FormsModule,
     RouterModule.forRoot([
+      {path:'Empleados/:id',component:HomeComponent},
+      {path:'add',component:HomeComponent},
+      {path:'Empleados/edit/:id',component:HomeComponent},
+      {path:'**',redirectTo:'/'},
       { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'counter', component: CounterComponent },
       { path: 'fetch-data', component: FetchDataComponent },

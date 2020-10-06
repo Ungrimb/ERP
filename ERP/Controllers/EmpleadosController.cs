@@ -12,23 +12,23 @@ namespace ERP.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class EmpleadoesController : ControllerBase
+    public class EmpleadosController : ControllerBase
     {
         private readonly ERPContext _context;
 
-        public EmpleadoesController(ERPContext context)
+        public EmpleadosController(ERPContext context)
         {
             _context = context;
         }
 
-        // GET: api/Empleadoes
+        // GET: api/Empleados
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Empleado>>> GetEmpleados()
         {
             return await _context.Empleados.ToListAsync();
         }
 
-        // GET: api/Empleadoes/5
+        // GET: api/Empleados/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Empleado>> GetEmpleado(long id)
         {
@@ -42,7 +42,7 @@ namespace ERP.Controllers
             return empleado;
         }
 
-        // PUT: api/Empleadoes/5
+        // PUT: api/Empleados/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
@@ -86,7 +86,7 @@ namespace ERP.Controllers
             return CreatedAtAction("GetEmpleado", new { id = empleado.Id }, empleado);
         }
 
-        // DELETE: api/Empleadoes/5
+        // DELETE: api/Empleados/5
         [HttpDelete("{id}")]
         public async Task<ActionResult<Empleado>> DeleteEmpleado(long id)
         {

@@ -7,11 +7,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using ERP.Data;
+using System;
+using ERPAngular.Data;
 
 namespace ERP
 {
     public class Startup
     {
+        readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -22,17 +25,23 @@ namespace ERP
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
-            services.AddMvc();
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: MyAllowSpecificOrigins,
+                                  builder =>
+                                  {
+                                      builder.AllowAnyOrigin().AllowAnyMethod();
+                                  });
+            });
 
-            var connection = @"Server=(localdb)\MSSQLLocalDB;Database=ERP;Trusted_Connection=True;";
-            services.AddDbContext<ERPContext>(options => options.UseSqlServer(connection));
-            
+            services.AddControllersWithViews();
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
                 configuration.RootPath = "ClientApp/dist";
             });
+
+            services.AddScoped(typeof(IDataRepository<>), typeof(DataRepository<>));
 
             services.AddDbContext<ERPContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("ERPContext")));
@@ -60,12 +69,14 @@ namespace ERP
             }
 
             app.UseRouting();
+            app.UseCors();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller}/{action=Index}/{id?}");
+                    pattern: "{controller}/{action=Index}/{id?}")
+                .RequireCors(MyAllowSpecificOrigins);
             });
 
             app.UseSpa(spa =>
@@ -77,6 +88,7 @@ namespace ERP
 
                 if (env.IsDevelopment())
                 {
+                    spa.Options.StartupTimeout = TimeSpan.FromSeconds(120);
                     spa.UseAngularCliServer(npmScript: "start");
                 }
             });

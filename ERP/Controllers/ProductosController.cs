@@ -12,48 +12,48 @@ namespace ERP.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PedidoesController : ControllerBase
+    public class ProductosController : ControllerBase
     {
         private readonly ERPContext _context;
 
-        public PedidoesController(ERPContext context)
+        public ProductosController(ERPContext context)
         {
             _context = context;
         }
 
-        // GET: api/Pedidoes
+        // GET: api/Productoes
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Pedido>>> GetPedidos()
+        public async Task<ActionResult<IEnumerable<Producto>>> GetProductos()
         {
-            return await _context.Pedidos.ToListAsync();
+            return await _context.Productos.ToListAsync();
         }
 
-        // GET: api/Pedidoes/5
+        // GET: api/Productoes/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Pedido>> GetPedido(long id)
+        public async Task<ActionResult<Producto>> GetProducto(long id)
         {
-            var pedido = await _context.Pedidos.FindAsync(id);
+            var producto = await _context.Productos.FindAsync(id);
 
-            if (pedido == null)
+            if (producto == null)
             {
                 return NotFound();
             }
 
-            return pedido;
+            return producto;
         }
 
-        // PUT: api/Pedidoes/5
+        // PUT: api/Productoes/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPedido(long id, Pedido pedido)
+        public async Task<IActionResult> PutProducto(long id, Producto producto)
         {
-            if (id != pedido.Id)
+            if (id != producto.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(pedido).State = EntityState.Modified;
+            _context.Entry(producto).State = EntityState.Modified;
 
             try
             {
@@ -61,7 +61,7 @@ namespace ERP.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!PedidoExists(id))
+                if (!ProductoExists(id))
                 {
                     return NotFound();
                 }
@@ -74,20 +74,20 @@ namespace ERP.Controllers
             return NoContent();
         }
 
-        // POST: api/Pedidoes
+        // POST: api/Productoes
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public async Task<ActionResult<Pedido>> PostPedido(Pedido pedido)
+        public async Task<ActionResult<Producto>> PostProducto(Producto producto)
         {
-            _context.Pedidos.Add(pedido);
+            _context.Productos.Add(producto);
             try
             {
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateException)
             {
-                if (PedidoExists(pedido.Id))
+                if (ProductoExists(producto.Id))
                 {
                     return Conflict();
                 }
@@ -97,28 +97,28 @@ namespace ERP.Controllers
                 }
             }
 
-            return CreatedAtAction("GetPedido", new { id = pedido.Id }, pedido);
+            return CreatedAtAction("GetProducto", new { id = producto.Id }, producto);
         }
 
-        // DELETE: api/Pedidoes/5
+        // DELETE: api/Productoes/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Pedido>> DeletePedido(long id)
+        public async Task<ActionResult<Producto>> DeleteProducto(long id)
         {
-            var pedido = await _context.Pedidos.FindAsync(id);
-            if (pedido == null)
+            var producto = await _context.Productos.FindAsync(id);
+            if (producto == null)
             {
                 return NotFound();
             }
 
-            _context.Pedidos.Remove(pedido);
+            _context.Productos.Remove(producto);
             await _context.SaveChangesAsync();
 
-            return pedido;
+            return producto;
         }
 
-        private bool PedidoExists(long id)
+        private bool ProductoExists(long id)
         {
-            return _context.Pedidos.Any(e => e.Id == id);
+            return _context.Productos.Any(e => e.Id == id);
         }
     }
 }
