@@ -7,31 +7,40 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ERP.Data;
 using ERP.Models;
+using ERPAngular.Data;
 
 namespace ERP.Controllers
 {
+    [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
     public class ClientesController : ControllerBase
     {
         private readonly ERPContext _context;
+        private readonly IDataRepository<Cliente> _repo;
 
-        public ClientesController(ERPContext context)
+        public ClientesController(ERPContext context, IDataRepository<Cliente> repo)
         {
             _context = context;
+            _repo = repo;
         }
 
         // GET: api/Clientes
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Cliente>>> GetClientes()
+        public IEnumerable<Cliente> GetClientes()
         {
-            return await _context.Clientes.ToListAsync();
+            return _context.Clientes.OrderByDescending(p => p.Id);
         }
 
         // GET: api/Clientes/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Cliente>> GetCliente(long id)
+        public async Task<IActionResult> GetCliente([FromRoute] long id)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var cliente = await _context.Clientes.FindAsync(id);
 
             if (cliente == null)
@@ -39,15 +48,20 @@ namespace ERP.Controllers
                 return NotFound();
             }
 
-            return cliente;
+            return Ok(cliente);
         }
 
         // PUT: api/Clientes/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCliente(long id, Cliente cliente)
+        public async Task<IActionResult> PutCliente([FromRoute] long id, [FromBody] Cliente cliente)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             if (id != cliente.Id)
             {
                 return BadRequest();
@@ -57,7 +71,8 @@ namespace ERP.Controllers
 
             try
             {
-                await _context.SaveChangesAsync();
+                _repo.Update(cliente);
+                var save = await _repo.SaveAsync(cliente);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -78,42 +93,38 @@ namespace ERP.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public async Task<ActionResult<Cliente>> PostCliente(Cliente cliente)
+        public async Task<IActionResult> PostCliente([FromBody] Cliente cliente)
         {
-            _context.Clientes.Add(cliente);
-            try
+            if (!ModelState.IsValid)
             {
-                await _context.SaveChangesAsync();
+                return BadRequest(ModelState);
             }
-            catch (DbUpdateException)
-            {
-                if (ClienteExists(cliente.Id))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+
+            _repo.Add(cliente);
+            var save = await _repo.SaveAsync(cliente);
 
             return CreatedAtAction("GetCliente", new { id = cliente.Id }, cliente);
         }
 
         // DELETE: api/Clientes/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Cliente>> DeleteCliente(long id)
+        public async Task<IActionResult> DeleteCliente([FromRoute] long id)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var cliente = await _context.Clientes.FindAsync(id);
             if (cliente == null)
             {
                 return NotFound();
             }
 
-            _context.Clientes.Remove(cliente);
-            await _context.SaveChangesAsync();
+            _repo.Delete(cliente);
+            var save = await _repo.SaveAsync(cliente);
 
-            return cliente;
+            return Ok(cliente);
         }
 
         private bool ClienteExists(long id)

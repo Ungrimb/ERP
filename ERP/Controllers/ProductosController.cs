@@ -7,31 +7,40 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ERP.Data;
 using ERP.Models;
+using ERPAngular.Data;
 
 namespace ERP.Controllers
 {
+    [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
     public class ProductosController : ControllerBase
     {
         private readonly ERPContext _context;
+        private readonly IDataRepository<Producto> _repo;
 
-        public ProductosController(ERPContext context)
+        public ProductosController(ERPContext context, IDataRepository<Producto> repo)
         {
             _context = context;
+            _repo = repo;
         }
 
         // GET: api/Productoes
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Producto>>> GetProductos()
+        public IEnumerable<Producto> GetEmpleados()
         {
-            return await _context.Productos.ToListAsync();
+            return _context.Productos.OrderByDescending(p => p.Id);
         }
 
         // GET: api/Productoes/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Producto>> GetProducto(long id)
+        public async Task<IActionResult> GetProducto([FromRoute] long id)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var producto = await _context.Productos.FindAsync(id);
 
             if (producto == null)
@@ -39,15 +48,20 @@ namespace ERP.Controllers
                 return NotFound();
             }
 
-            return producto;
+            return Ok(producto);
         }
 
         // PUT: api/Productoes/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutProducto(long id, Producto producto)
+        public async Task<IActionResult> PutProducto([FromRoute] long id, [FromBody] Producto producto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             if (id != producto.Id)
             {
                 return BadRequest();
@@ -57,7 +71,8 @@ namespace ERP.Controllers
 
             try
             {
-                await _context.SaveChangesAsync();
+                _repo.Update(producto);
+                var save = await _repo.SaveAsync(producto);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -78,42 +93,38 @@ namespace ERP.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public async Task<ActionResult<Producto>> PostProducto(Producto producto)
+        public async Task<IActionResult> PostProducto([FromBody] Producto producto)
         {
-            _context.Productos.Add(producto);
-            try
+            if (!ModelState.IsValid)
             {
-                await _context.SaveChangesAsync();
+                return BadRequest(ModelState);
             }
-            catch (DbUpdateException)
-            {
-                if (ProductoExists(producto.Id))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+
+            _repo.Add(producto);
+            var save = await _repo.SaveAsync(producto);
 
             return CreatedAtAction("GetProducto", new { id = producto.Id }, producto);
         }
 
         // DELETE: api/Productoes/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Producto>> DeleteProducto(long id)
+        public async Task<IActionResult> DeleteProducto([FromRoute] long id)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var producto = await _context.Productos.FindAsync(id);
             if (producto == null)
             {
                 return NotFound();
             }
 
-            _context.Productos.Remove(producto);
-            await _context.SaveChangesAsync();
+            _repo.Delete(producto);
+            var save = await _repo.SaveAsync(producto);
 
-            return producto;
+            return Ok(producto);
         }
 
         private bool ProductoExists(long id)

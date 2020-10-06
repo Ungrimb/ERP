@@ -7,31 +7,40 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ERP.Data;
 using ERP.Models;
+using ERPAngular.Data;
 
 namespace ERP.Controllers
 {
+    [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
     public class EmpleadosController : ControllerBase
     {
         private readonly ERPContext _context;
+        private readonly IDataRepository<Empleado> _repo;
 
-        public EmpleadosController(ERPContext context)
+        public EmpleadosController(ERPContext context, IDataRepository<Empleado> repo)
         {
             _context = context;
+            _repo = repo;
         }
 
         // GET: api/Empleados
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Empleado>>> GetEmpleados()
+        public IEnumerable<Empleado> GetEmpleados()
         {
-            return await _context.Empleados.ToListAsync();
+            return _context.Empleados.OrderByDescending(p => p.Id);
         }
 
         // GET: api/Empleados/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Empleado>> GetEmpleado(long id)
+        public async Task<IActionResult> GetEmpleado([FromRoute] long id)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var empleado = await _context.Empleados.FindAsync(id);
 
             if (empleado == null)
@@ -39,15 +48,20 @@ namespace ERP.Controllers
                 return NotFound();
             }
 
-            return empleado;
+            return Ok(empleado);
         }
 
         // PUT: api/Empleados/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutEmpleado(long id, Empleado empleado)
+        public async Task<IActionResult> PutEmpleado([FromRoute] long id, [FromBody] Empleado empleado)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             if (id != empleado.Id)
             {
                 return BadRequest();
@@ -57,7 +71,8 @@ namespace ERP.Controllers
 
             try
             {
-                await _context.SaveChangesAsync();
+                _repo.Update(empleado);
+                var save = await _repo.SaveAsync(empleado);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -78,28 +93,38 @@ namespace ERP.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public async Task<ActionResult<Empleado>> PostEmpleado(Empleado empleado)
+        public async Task<IActionResult> PostEmpleado([FromBody] Empleado empleado)
         {
-            _context.Empleados.Add(empleado);
-            await _context.SaveChangesAsync();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            _repo.Add(empleado);
+            var save = await _repo.SaveAsync(empleado);
 
             return CreatedAtAction("GetEmpleado", new { id = empleado.Id }, empleado);
         }
 
         // DELETE: api/Empleados/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Empleado>> DeleteEmpleado(long id)
+        public async Task<IActionResult> DeleteEmpleado([FromRoute] long id)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var empleado = await _context.Empleados.FindAsync(id);
             if (empleado == null)
             {
                 return NotFound();
             }
 
-            _context.Empleados.Remove(empleado);
-            await _context.SaveChangesAsync();
+            _repo.Delete(empleado);
+            var save = await _repo.SaveAsync(empleado);
 
-            return empleado;
+            return Ok(empleado);
         }
 
         private bool EmpleadoExists(long id)

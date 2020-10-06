@@ -7,31 +7,40 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ERP.Data;
 using ERP.Models;
+using ERPAngular.Data;
 
 namespace ERP.Controllers
 {
+    [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
     public class LineasPedidosController : ControllerBase
     {
         private readonly ERPContext _context;
+        private readonly IDataRepository<LineasPedido> _repo;
 
-        public LineasPedidosController(ERPContext context)
+        public LineasPedidosController(ERPContext context, IDataRepository<LineasPedido> repo)
         {
             _context = context;
+            _repo = repo;
         }
 
         // GET: api/LineasPedidos
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<LineasPedido>>> GetLineasPedidos()
+        public IEnumerable<LineasPedido> GetEmpleados()
         {
-            return await _context.LineasPedidos.ToListAsync();
+            return _context.LineasPedidos.OrderByDescending(p => p.IdLinea);
         }
 
         // GET: api/LineasPedidos/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<LineasPedido>> GetLineasPedido(long id)
+        public async Task<IActionResult> GetLineasPedido([FromRoute] long id)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var lineasPedido = await _context.LineasPedidos.FindAsync(id);
 
             if (lineasPedido == null)
@@ -39,15 +48,20 @@ namespace ERP.Controllers
                 return NotFound();
             }
 
-            return lineasPedido;
+            return Ok(lineasPedido);
         }
 
         // PUT: api/LineasPedidos/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutLineasPedido(long id, LineasPedido lineasPedido)
+        public async Task<IActionResult> PutLineasPedido([FromRoute] long id, [FromBody] LineasPedido lineasPedido)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             if (id != lineasPedido.IdLinea)
             {
                 return BadRequest();
@@ -57,7 +71,8 @@ namespace ERP.Controllers
 
             try
             {
-                await _context.SaveChangesAsync();
+                _repo.Update(lineasPedido);
+                var save = await _repo.SaveAsync(lineasPedido);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -78,42 +93,38 @@ namespace ERP.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public async Task<ActionResult<LineasPedido>> PostLineasPedido(LineasPedido lineasPedido)
+        public async Task<IActionResult> PostLineasPedido([FromBody] LineasPedido lineasPedido)
         {
-            _context.LineasPedidos.Add(lineasPedido);
-            try
+            if (!ModelState.IsValid)
             {
-                await _context.SaveChangesAsync();
+                return BadRequest(ModelState);
             }
-            catch (DbUpdateException)
-            {
-                if (LineasPedidoExists(lineasPedido.IdLinea))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+
+            _repo.Add(lineasPedido);
+            var save = await _repo.SaveAsync(lineasPedido);
 
             return CreatedAtAction("GetLineasPedido", new { id = lineasPedido.IdLinea }, lineasPedido);
         }
 
         // DELETE: api/LineasPedidos/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<LineasPedido>> DeleteLineasPedido(long id)
+        public async Task<IActionResult> DeleteLineasPedido([FromRoute] long id)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var lineasPedido = await _context.LineasPedidos.FindAsync(id);
             if (lineasPedido == null)
             {
                 return NotFound();
             }
 
-            _context.LineasPedidos.Remove(lineasPedido);
-            await _context.SaveChangesAsync();
+            _repo.Delete(lineasPedido);
+            var save = await _repo.SaveAsync(lineasPedido);
 
-            return lineasPedido;
+            return Ok(lineasPedido);
         }
 
         private bool LineasPedidoExists(long id)

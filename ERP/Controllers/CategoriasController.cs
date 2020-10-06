@@ -7,31 +7,40 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ERP.Data;
 using ERP.Models;
+using ERPAngular.Data;
 
 namespace ERP.Controllers
 {
+    [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
     public class CategoriasController : ControllerBase
     {
         private readonly ERPContext _context;
+        private readonly IDataRepository<Categoria> _repo;
 
-        public CategoriasController(ERPContext context)
+        public CategoriasController(ERPContext context, IDataRepository<Categoria> repo)
         {
             _context = context;
+            _repo = repo;
         }
 
         // GET: api/Categorias
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Categoria>>> GetCategorias()
+        public IEnumerable<Categoria> GetEmpleados()
         {
-            return await _context.Categorias.ToListAsync();
+            return _context.Categorias.OrderByDescending(p => p.Id);
         }
 
         // GET: api/Categorias/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Categoria>> GetCategoria(long id)
+        public async Task<IActionResult> GetCategoria([FromRoute] long id)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var categoria = await _context.Categorias.FindAsync(id);
 
             if (categoria == null)
@@ -39,15 +48,20 @@ namespace ERP.Controllers
                 return NotFound();
             }
 
-            return categoria;
+            return Ok(categoria);
         }
 
         // PUT: api/Categorias/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCategoria(long id, Categoria categoria)
+        public async Task<IActionResult> PutCategoria([FromRoute] long id, [FromBody] Categoria categoria)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             if (id != categoria.Id)
             {
                 return BadRequest();
@@ -57,7 +71,8 @@ namespace ERP.Controllers
 
             try
             {
-                await _context.SaveChangesAsync();
+                _repo.Update(categoria);
+                var save = await _repo.SaveAsync(categoria);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -78,42 +93,38 @@ namespace ERP.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public async Task<ActionResult<Categoria>> PostCategoria(Categoria categoria)
+        public async Task<IActionResult> PostCategoria([FromBody] Categoria categoria)
         {
-            _context.Categorias.Add(categoria);
-            try
+            if (!ModelState.IsValid)
             {
-                await _context.SaveChangesAsync();
+                return BadRequest(ModelState);
             }
-            catch (DbUpdateException)
-            {
-                if (CategoriaExists(categoria.Id))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+
+            _repo.Add(categoria);
+            var save = await _repo.SaveAsync(categoria);
 
             return CreatedAtAction("GetCategoria", new { id = categoria.Id }, categoria);
         }
 
         // DELETE: api/Categorias/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Categoria>> DeleteCategoria(long id)
+        public async Task<IActionResult> DeleteCategoria([FromRoute] long id)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var categoria = await _context.Categorias.FindAsync(id);
             if (categoria == null)
             {
                 return NotFound();
             }
 
-            _context.Categorias.Remove(categoria);
-            await _context.SaveChangesAsync();
+            _repo.Delete(categoria);
+            var save = await _repo.SaveAsync(categoria);
 
-            return categoria;
+            return Ok(categoria);
         }
 
         private bool CategoriaExists(long id)
