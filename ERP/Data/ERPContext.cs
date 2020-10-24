@@ -73,11 +73,11 @@ namespace ERP.Data
 
             modelBuilder.Entity<LineasPedido>(entity =>
             {
-                entity.HasKey(e => e.IdLinea);
+                entity.HasKey(e => e.Id);
 
                 entity.ToTable("LineasPedido");
 
-                entity.Property(e => e.IdLinea)
+                entity.Property(e => e.Id)
                     .ValueGeneratedNever()
                     .HasColumnName("idLinea");
 

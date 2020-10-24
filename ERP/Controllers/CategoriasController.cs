@@ -7,129 +7,135 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ERP.Data;
 using ERP.Models;
-using ERPAngular.Data;
 
 namespace ERP.Controllers
 {
     [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
-    public class CategoriasController : ControllerBase
+    public class CategoriasController : GenericController <Categoria, DataRepository<Categoria>>
     {
-        private readonly ERPContext _context;
-        private readonly IDataRepository<Categoria> _repo;
 
-        public CategoriasController(ERPContext context, IDataRepository<Categoria> repo)
+        public CategoriasController(DataRepository<Categoria> repository) : base(repository)
         {
-            _context = context;
-            _repo = repo;
+
         }
 
-        // GET: api/Categorias
-        [HttpGet]
-        public IEnumerable<Categoria> GetEmpleados()
-        {
-            return _context.Categorias.OrderByDescending(p => p.Id);
-        }
+        //    private readonly ERPContext _context;
+        //    private readonly IDataRepository<Categoria> _repo;
 
-        // GET: api/Categorias/5
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetCategoria([FromRoute] long id)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+        //    public CategoriasController(ERPContext context, IDataRepository<Categoria> repo)
+        //    {
+        //        _context = context;
+        //        _repo = repo;
+        //    }
 
-            var categoria = await _context.Categorias.FindAsync(id);
+        //    // GET: api/Categorias
+        //    [HttpGet]
+        //    public IEnumerable<Categoria> GetEmpleados()
+        //    {
+        //        return _context.Categorias.OrderByDescending(p => p.Id);
+        //    }
 
-            if (categoria == null)
-            {
-                return NotFound();
-            }
+        //    // GET: api/Categorias/5
+        //    [HttpGet("{id}")]
+        //    public async Task<IActionResult> GetCategoria([FromRoute] long id)
+        //    {
+        //        if (!ModelState.IsValid)
+        //        {
+        //            return BadRequest(ModelState);
+        //        }
 
-            return Ok(categoria);
-        }
+        //        var categoria = await _context.Categorias.FindAsync(id);
 
-        // PUT: api/Categorias/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutCategoria([FromRoute] long id, [FromBody] Categoria categoria)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+        //        if (categoria == null)
+        //        {
+        //            return NotFound();
+        //        }
 
-            if (id != categoria.Id)
-            {
-                return BadRequest();
-            }
+        //        return Ok(categoria);
+        //    }
 
-            _context.Entry(categoria).State = EntityState.Modified;
+        //    // PUT: api/Categorias/5
+        //    // To protect from overposting attacks, enable the specific properties you want to bind to, for
+        //    // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+        //    [HttpPut("{id}")]
+        //    public async Task<IActionResult> PutCategoria([FromRoute] long id, [FromBody] Categoria categoria)
+        //    {
+        //        if (!ModelState.IsValid)
+        //        {
+        //            return BadRequest(ModelState);
+        //        }
 
-            try
-            {
-                _repo.Update(categoria);
-                var save = await _repo.SaveAsync(categoria);
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!CategoriaExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+        //        if (id != categoria.Id)
+        //        {
+        //            return BadRequest();
+        //        }
 
-            return NoContent();
-        }
+        //        _context.Entry(categoria).State = EntityState.Modified;
 
-        // POST: api/Categorias
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPost]
-        public async Task<IActionResult> PostCategoria([FromBody] Categoria categoria)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+        //        try
+        //        {
+        //            _repo.Update(categoria);
+        //            var save = await _repo.SaveAsync(categoria);
+        //        }
+        //        catch (DbUpdateConcurrencyException)
+        //        {
+        //            if (!CategoriaExists(id))
+        //            {
+        //                return NotFound();
+        //            }
+        //            else
+        //            {
+        //                throw;
+        //            }
+        //        }
 
-            _repo.Add(categoria);
-            var save = await _repo.SaveAsync(categoria);
+        //        return NoContent();
+        //    }
 
-            return CreatedAtAction("GetCategoria", new { id = categoria.Id }, categoria);
-        }
+        //    // POST: api/Categorias
+        //    // To protect from overposting attacks, enable the specific properties you want to bind to, for
+        //    // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+        //    [HttpPost]
+        //    public async Task<IActionResult> PostCategoria([FromBody] Categoria categoria)
+        //    {
+        //        if (!ModelState.IsValid)
+        //        {
+        //            return BadRequest(ModelState);
+        //        }
 
-        // DELETE: api/Categorias/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCategoria([FromRoute] long id)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+        //        _repo.Add(categoria);
+        //        var save = await _repo.SaveAsync(categoria);
 
-            var categoria = await _context.Categorias.FindAsync(id);
-            if (categoria == null)
-            {
-                return NotFound();
-            }
+        //        return CreatedAtAction("GetCategoria", new { id = categoria.Id }, categoria);
+        //    }
 
-            _repo.Delete(categoria);
-            var save = await _repo.SaveAsync(categoria);
+        //    // DELETE: api/Categorias/5
+        //    [HttpDelete("{id}")]
+        //    public async Task<IActionResult> DeleteCategoria([FromRoute] long id)
+        //    {
+        //        if (!ModelState.IsValid)
+        //        {
+        //            return BadRequest(ModelState);
+        //        }
 
-            return Ok(categoria);
-        }
+        //        var categoria = await _context.Categorias.FindAsync(id);
+        //        if (categoria == null)
+        //        {
+        //            return NotFound();
+        //        }
 
-        private bool CategoriaExists(long id)
-        {
-            return _context.Categorias.Any(e => e.Id == id);
-        }
+        //        _repo.Delete(categoria);
+        //        var save = await _repo.SaveAsync(categoria);
+
+        //        return Ok(categoria);
+        //    }
+
+        //    private bool CategoriaExists(long id)
+        //    {
+        //        return _context.Categorias.Any(e => e.Id == id);
+        //    }
+        //}
     }
 }

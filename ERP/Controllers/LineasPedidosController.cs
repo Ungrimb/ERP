@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ERP.Data;
 using ERP.Models;
-using ERPAngular.Data;
 
 namespace ERP.Controllers
 {
@@ -29,7 +28,7 @@ namespace ERP.Controllers
         [HttpGet]
         public IEnumerable<LineasPedido> GetEmpleados()
         {
-            return _context.LineasPedidos.OrderByDescending(p => p.IdLinea);
+            return _context.LineasPedidos.OrderByDescending(p => p.Id);
         }
 
         // GET: api/LineasPedidos/5
@@ -62,7 +61,7 @@ namespace ERP.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (id != lineasPedido.IdLinea)
+            if (id != lineasPedido.Id)
             {
                 return BadRequest();
             }
@@ -103,7 +102,7 @@ namespace ERP.Controllers
             _repo.Add(lineasPedido);
             var save = await _repo.SaveAsync(lineasPedido);
 
-            return CreatedAtAction("GetLineasPedido", new { id = lineasPedido.IdLinea }, lineasPedido);
+            return CreatedAtAction("GetLineasPedido", new { id = lineasPedido.Id }, lineasPedido);
         }
 
         // DELETE: api/LineasPedidos/5
@@ -121,7 +120,7 @@ namespace ERP.Controllers
                 return NotFound();
             }
 
-            _repo.Delete(lineasPedido);
+            //_repo.Delete(lineasPedido);
             var save = await _repo.SaveAsync(lineasPedido);
 
             return Ok(lineasPedido);
@@ -129,7 +128,7 @@ namespace ERP.Controllers
 
         private bool LineasPedidoExists(long id)
         {
-            return _context.LineasPedidos.Any(e => e.IdLinea == id);
+            return _context.LineasPedidos.Any(e => e.Id == id);
         }
     }
 }

@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ERP.Data;
 using ERP.Models;
-using ERPAngular.Data;
 
 namespace ERP.Controllers
 {
@@ -121,7 +120,7 @@ namespace ERP.Controllers
                 return NotFound();
             }
 
-            _repo.Delete(cliente);
+            //_repo.Delete(cliente);
             var save = await _repo.SaveAsync(cliente);
 
             return Ok(cliente);

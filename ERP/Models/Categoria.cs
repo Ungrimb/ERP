@@ -1,11 +1,12 @@
-﻿using System;
+﻿using ERP.Data;
+using System;
 using System.Collections.Generic;
 
 #nullable disable
 
 namespace ERP.Models
 {
-    public partial class Categoria
+    public partial class Categoria : IEntity
     {
         public Categoria()
         {

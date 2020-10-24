@@ -8,7 +8,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using ERP.Data;
 using System;
-using ERPAngular.Data;
 
 namespace ERP
 {
@@ -42,6 +41,7 @@ namespace ERP
             });
 
             services.AddScoped(typeof(IDataRepository<>), typeof(DataRepository<>));
+            //services.AddScoped<CategoriaRepository>();
 
             services.AddDbContext<ERPContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("ERPContext")));

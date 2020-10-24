@@ -1,11 +1,12 @@
-﻿using System;
+﻿using ERP.Data;
+using System;
 using System.Collections.Generic;
 
 #nullable disable
 
 namespace ERP.Models
 {
-    public partial class Pedido
+    public partial class Pedido : IEntity
     {
         public Pedido()
         {
