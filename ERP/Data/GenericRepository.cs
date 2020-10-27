@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ERP.Data
 {
-    public class GenericRepository <T> : IGenericRepository<T> where T : class
+    public class GenericRepository <T> : IGenericRepository<T> where T : class,new()
     {
 
         private readonly ERPContext _dbcontext;
@@ -18,16 +18,42 @@ namespace ERP.Data
 
         public async Task<T> Add(T entity)
         {
-            _dbcontext.Set<T>().Add(entity);
-            await _dbcontext.SaveChangesAsync();
-            return entity;
+            if (entity == null)
+            {
+                throw new ArgumentNullException($"{nameof(Add)} entity must not be null");
+            }
+
+            try
+            {
+                await _dbcontext.AddAsync(entity);
+                await _dbcontext.SaveChangesAsync();
+
+                return entity;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"{nameof(entity)} could not be saved: {ex.Message}");
+            }
         }
 
         public async virtual Task<T> Update(T entity)
         {
-            _dbcontext.Entry(entity).State = (Microsoft.EntityFrameworkCore.EntityState)EntityState.Modified;
+            if (entity == null)
+        {
+            throw new ArgumentNullException($"{nameof(Update)} entity must not be null");
+        }
+
+        try
+        {
+            _dbcontext.Update(entity);
             await _dbcontext.SaveChangesAsync();
+
             return entity;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"{nameof(entity)} could not be updated: {ex.Message}");
+        }
         }
 
         public async virtual Task<T> Delete(long Id)
@@ -55,9 +81,21 @@ namespace ERP.Data
             return await _dbcontext.Set<T>().FindAsync(Id);
         }
 
-        public async Task<List<T>> GetAll()
+        //public async Task<List<T>> GetAll()
+        //{
+        //    return await _dbcontext.Set<T>().ToListAsync();
+        //}
+
+        public IQueryable<T> GetAll()
         {
-            return await _dbcontext.Set<T>().ToListAsync();
+            try
+            {
+                return _dbcontext.Set<T>();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Couldn't retrieve entities: {ex.Message}");
+            }
         }
 
     }

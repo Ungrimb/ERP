@@ -18,12 +18,12 @@ namespace ERP.Controllers
 
         GenericUnitOfWork _unitOfWork;
         
-        public ActionResult Index()
-        {
-            _unitOfWork = new GenericUnitOfWork();
-            var _categorias = _unitOfWork.GetRepoInstance<Categoria>().GetAll();
-            return View (_categorias);
-        }
+        //public ActionResult Index()
+        //{
+        //    _unitOfWork = new GenericUnitOfWork();
+        //    var _categorias = _unitOfWork.GetRepoInstance<Categoria>().GetAll();
+        //    return View (_categorias);
+        //}
 
     }
 }

@@ -40,8 +40,8 @@ namespace ERP
                 configuration.RootPath = "ClientApp/dist";
             });
 
-            services.AddScoped(typeof(IDataRepository<>), typeof(DataRepository<>));
-            //services.AddScoped<CategoriaRepository>();
+            //services.AddScoped(typeof(IDataRepository<>), typeof(DataRepository<>));
+            services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
             services.AddDbContext<ERPContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("ERPContext")));

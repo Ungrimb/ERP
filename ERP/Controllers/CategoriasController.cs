@@ -13,10 +13,10 @@ namespace ERP.Controllers
     [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
-    public class CategoriasController : GenericController <Categoria, DataRepository<Categoria>>
+    public class CategoriasController : Controller
     {
 
-        public CategoriasController(DataRepository<Categoria> repository) : base(repository)
+        public CategoriasController(GenericRepository<Categoria> repository) : base(repository)
         {
 
         }
