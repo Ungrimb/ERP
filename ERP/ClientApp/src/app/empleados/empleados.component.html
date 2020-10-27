@@ -1,1 +1,24 @@
-<p>empleados works!</p>
+<h2>Empleados</h2>
+<button class="btn btn-primary">Agregar Empleado</button>
+
+<p *ngIf="!(empleados && empleados.length)">No existen registros para mostrar</p>
+
+<table class="table" *ngIf="(empleados && empleados.length)">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let empleado of empleados">
+            <td>{{empleado.name}}</td>
+            <td>{{empleado.surname}}</td>
+            <td>
+                <button>Editar</button>
+                <button>Borrar</button>
+            </td>
+        </tr>
+    </tbody>
+</table>

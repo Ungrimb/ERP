@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { IEmpleado } from '../model/empleado';
+import { EmpleadosService } from '../service/empleados.service';
+
 
 @Component({
   selector: 'app-empleados',
@@ -7,9 +10,22 @@ import { Component, OnInit } from '@angular/core';
 })
 export class EmpleadosComponent implements OnInit {
 
-  constructor() { }
+  empleados : IEmpleado[];
+
+  constructor(private empleadosService: EmpleadosService) { }
 
   ngOnInit(): void {
+    this.cargarData();
+  }
+  cargarData() {
+    this.empleadosService.getEmpleados()
+      .subscribe(empleadosWS => this.empleados = empleadosWS,
+        error => console.error(error));
+  }
+  delete(empleado: IEmpleado) {
+    this.empleadosService.deleteEmpleado(empleado.Id)
+      .subscribe(empleado => this.cargarData(),
+        error => console.error(error));
   }
 
 }

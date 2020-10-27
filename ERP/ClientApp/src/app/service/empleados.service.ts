@@ -1,10 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { retry, catchError } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
-
-import { Empleado } from '../model/empleado';
+import { IEmpleado } from '../model/empleado';
 
 @Injectable({
   providedIn: 'root'
@@ -24,40 +23,40 @@ export class EmpleadosService {
     this.myApiUrl = 'api/Empleados/';
 }
 
-getEmpleados(): Observable<Empleado[]> {
-  return this.http.get<Empleado[]>(this.myAppUrl + this.myApiUrl)
+getEmpleados(): Observable<IEmpleado[]> {
+  return this.http.get<IEmpleado[]>(this.myAppUrl + this.myApiUrl)
   .pipe(
     retry(1),
     catchError(this.errorHandler)
   );
 }
 
-getEmpleado(Id: number): Observable<Empleado> {
-    return this.http.get<Empleado>(this.myAppUrl + this.myApiUrl + Id)
+getEmpleado(Id: number): Observable<IEmpleado> {
+    return this.http.get<IEmpleado>(this.myAppUrl + this.myApiUrl + Id)
     .pipe(
       retry(1),
       catchError(this.errorHandler)
     );
 }
 
-saveEmpleado(empleado): Observable<Empleado> {
-    return this.http.post<Empleado>(this.myAppUrl + this.myApiUrl, JSON.stringify(empleado), this.httpOptions)
+saveEmpleado(empleado): Observable<IEmpleado> {
+    return this.http.post<IEmpleado>(this.myAppUrl + this.myApiUrl, JSON.stringify(empleado), this.httpOptions)
     .pipe(
       retry(1),
       catchError(this.errorHandler)
     );
 }
 
-updateEmpleado(Id: number, empleado): Observable<Empleado> {
-    return this.http.put<Empleado>(this.myAppUrl + this.myApiUrl + Id, JSON.stringify(empleado), this.httpOptions)
+updateEmpleado(Id: number, empleado): Observable<IEmpleado> {
+    return this.http.put<IEmpleado>(this.myAppUrl + this.myApiUrl + Id, JSON.stringify(empleado), this.httpOptions)
     .pipe(
       retry(1),
       catchError(this.errorHandler)
     );
 }
 
-deleteEmpleado(Id: number): Observable<Empleado> {
-    return this.http.delete<Empleado>(this.myAppUrl + this.myApiUrl + Id)
+deleteEmpleado(Id: number): Observable<IEmpleado> {
+    return this.http.delete<IEmpleado>(this.myAppUrl + this.myApiUrl + Id)
     .pipe(
       retry(1),
       catchError(this.errorHandler)
